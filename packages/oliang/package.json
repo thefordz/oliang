@@ -1,6 +1,6 @@
 {
   "name": "oliang",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Tiny error-handling core for Express + TypeScript apps. Scaffold a full app with `npm create oliang` ☕",
   "type": "module",
   "main": "dist/index.js",
