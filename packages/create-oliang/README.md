@@ -1,5 +1,9 @@
 # create-oliang ☕
 
+[![npm version](https://img.shields.io/npm/v/create-oliang.svg)](https://www.npmjs.com/package/create-oliang)
+![smoke test](https://github.com/thefordz/oliang/actions/workflows/smoke.yml/badge.svg)
+[![license](https://img.shields.io/npm/l/create-oliang.svg)](https://github.com/thefordz/oliang/blob/main/LICENSE)
+
 Scaffold an Express + TypeScript (or JavaScript) app, brewed the Thai way.
 
 > **Oliang (โอเลี้ยง)** is Thai iced black coffee — strong, sweet, and served fast.
@@ -67,9 +71,18 @@ my-app/
 └── package.json
 ```
 
+## Requirements
+
+- Node.js >= 18
+
 ## Docs
 
 See the [oliang repository](https://github.com/thefordz/oliang) for full docs.
+
+## Related
+
+- [`oliang`](https://www.npmjs.com/package/oliang) — error-handling core for
+  Express + TypeScript apps (AppError, errorHandler, HTTPSTATUS, getEnv)
 
 ## License
 

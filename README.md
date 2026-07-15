@@ -1,5 +1,9 @@
 # ☕ Oliang
 
+![smoke test](https://github.com/thefordz/oliang/actions/workflows/smoke.yml/badge.svg)
+[![npm version](https://img.shields.io/npm/v/create-oliang.svg)](https://www.npmjs.com/package/create-oliang)
+[![license](https://img.shields.io/npm/l/create-oliang.svg)](LICENSE)
+
 > **Oliang (โอเลี้ยง)** is Thai iced black coffee — strong, sweet, and served fast.
 > This project brews Express + TypeScript apps the same way.
 

@@ -1,5 +1,8 @@
 # oliang
 
+[![npm version](https://img.shields.io/npm/v/oliang.svg)](https://www.npmjs.com/package/oliang)
+[![license](https://img.shields.io/npm/l/oliang.svg)](https://github.com/thefordz/oliang/blob/main/LICENSE)
+
 Tiny error-handling core for Express + TypeScript apps ☕
 
 > Looking to start a new project? Use the scaffolder instead:
@@ -7,6 +10,8 @@ Tiny error-handling core for Express + TypeScript apps ☕
 > ```bash
 > npm create oliang
 > ```
+>
+> See [`create-oliang`](https://www.npmjs.com/package/create-oliang).
 
 ## Install
 
@@ -41,3 +46,9 @@ app.use(errorHandler);
 - `errorHandler` — Express error middleware that maps `AppError` to JSON responses
 - `HTTPSTATUS` / `HttpStatusCodeType` — HTTP status constants
 - `getEnv` — env reader that throws at startup when a required variable is missing
+
+## Requirements
+
+- Node.js >= 18
+- Express >= 4 (peer dependency)
+- TypeScript types included — no separate `@types` package needed
