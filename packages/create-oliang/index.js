@@ -26,6 +26,30 @@ const EXAMPLE_DEPENDENCIES = {
   zod: "^4.4.3",
 };
 
+const DATABASES = {
+  none: { label: "no database" },
+  mongodb: {
+    label: "MongoDB",
+    dependencies: { mongoose: "^9.7.4" },
+  },
+  prisma: {
+    label: "Prisma",
+    dependencies: {
+      "@prisma/client": "^7.8.0",
+      "@prisma/adapter-pg": "^7.8.0",
+    },
+    devDependencies: { prisma: "^7.8.0" },
+    scripts: { "db:push": "prisma db push", postinstall: "prisma generate" },
+  },
+};
+
+const sortKeys = (obj) =>
+  Object.fromEntries(
+    Object.keys(obj)
+      .sort()
+      .map((key) => [key, obj[key]]),
+  );
+
 const REPO_URL = "https://github.com/thefordz/oliang";
 
 const isValidPackageName = (name) => /^[a-z0-9][a-z0-9._-]*$/.test(name);
@@ -41,6 +65,7 @@ const parseArgs = (argv) => {
     language: undefined,
     starter: undefined,
     includeHttp: undefined,
+    database: undefined,
   };
   for (const arg of argv) {
     if (arg === "--typescript" || arg === "--ts") parsed.language = "typescript";
@@ -49,6 +74,9 @@ const parseArgs = (argv) => {
     else if (arg === "--example") parsed.starter = "example";
     else if (arg === "--http") parsed.includeHttp = true;
     else if (arg === "--no-http") parsed.includeHttp = false;
+    else if (arg === "--mongodb") parsed.database = "mongodb";
+    else if (arg === "--prisma") parsed.database = "prisma";
+    else if (arg === "--no-db") parsed.database = "none";
     else if (!arg.startsWith("-") && !parsed.projectName) parsed.projectName = arg;
   }
   return parsed;
@@ -78,7 +106,7 @@ async function main() {
       `\n${color.dim("│  Express apps, brewed the Thai way")}`,
   );
 
-  let { projectName, language, starter, includeHttp } = parseArgs(
+  let { projectName, language, starter, includeHttp, database } = parseArgs(
     process.argv.slice(2),
   );
   const interactive = process.stdout.isTTY;
@@ -141,6 +169,27 @@ async function main() {
     }
   }
 
+  if (!database) {
+    if (interactive) {
+      const answer = await p.select({
+        message: "Which database would you like?",
+        options: [
+          { value: "none", label: "None", hint: "in-memory, wire up your own later" },
+          { value: "mongodb", label: "MongoDB", hint: "mongoose" },
+          {
+            value: "prisma",
+            label: "Prisma ORM",
+            hint: "PostgreSQL by default — swap provider anytime",
+          },
+        ],
+      });
+      if (p.isCancel(answer)) exitCancelled();
+      database = answer;
+    } else {
+      database = "none";
+    }
+  }
+
   if (includeHttp === undefined) {
     if (interactive) {
       const answer = await p.confirm({
@@ -180,6 +229,20 @@ async function main() {
       recursive: true,
     });
   }
+  if (database !== "none") {
+    fs.cpSync(
+      path.join(cliDir, "templates", `db-${database}`, langDir),
+      targetDir,
+      { recursive: true },
+    );
+    if (starter === "example") {
+      fs.cpSync(
+        path.join(cliDir, "templates", `db-${database}-example`, langDir),
+        targetDir,
+        { recursive: true },
+      );
+    }
+  }
 
   // npm strips dotfiles when publishing, so templates ship them with a
   // "_" prefix and we restore the real names here.
@@ -196,23 +259,44 @@ async function main() {
     fs.rmSync(path.join(targetDir, "http"), { recursive: true, force: true });
   }
 
+  // Generated .env files reference the placeholder app name (e.g. the
+  // MongoDB database name) — swap it for the real project name.
+  for (const envFile of [".env", ".env.example"]) {
+    const envPath = path.join(targetDir, envFile);
+    const content = fs.readFileSync(envPath, "utf8");
+    if (content.includes("oliang-app")) {
+      fs.writeFileSync(envPath, content.replaceAll("oliang-app", packageName));
+    }
+  }
+
+  const db = DATABASES[database];
   const pkgPath = path.join(targetDir, "package.json");
   const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf8"));
   pkg.name = packageName;
-  if (starter === "example") {
-    const merged = { ...pkg.dependencies, ...EXAMPLE_DEPENDENCIES };
-    pkg.dependencies = Object.fromEntries(
-      Object.keys(merged)
-        .sort()
-        .map((key) => [key, merged[key]]),
-    );
+  const extraDependencies = {
+    ...(starter === "example" ? EXAMPLE_DEPENDENCIES : {}),
+    ...(db.dependencies || {}),
+  };
+  if (Object.keys(extraDependencies).length > 0) {
+    pkg.dependencies = sortKeys({ ...pkg.dependencies, ...extraDependencies });
+  }
+  if (db.devDependencies) {
+    pkg.devDependencies = sortKeys({
+      ...(pkg.devDependencies || {}),
+      ...db.devDependencies,
+    });
+  }
+  if (db.scripts) {
+    pkg.scripts = { ...pkg.scripts, ...db.scripts };
   }
   fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + "\n");
 
+  const dbSuffix =
+    database === "none" ? "" : ` · ${color.cyan(DATABASES[database].label)}`;
   brewSpinner.stop(
     `${color.cyan(LANGUAGES[language].label)} · ${color.cyan(
       `${STARTERS[starter].label} starter`,
-    )} → ${color.bold(`${projectName}/`)}`,
+    )}${dbSuffix} → ${color.bold(`${projectName}/`)}`,
   );
 
   let installed = false;
@@ -243,17 +327,6 @@ async function main() {
     }
   }
 
-  const steps = [
-    `cd ${projectName}`,
-    !installed && "npm install",
-    "npm run dev",
-  ]
-    .filter(Boolean)
-    .map((step) => color.cyan(step))
-    .join("\n");
-
-  p.note(steps, "Next steps");
-
   if (starter === "example") {
     p.log.info(
       `Once running, try the example API:\n${color.dim(
@@ -269,6 +342,36 @@ async function main() {
       )}`,
     );
   }
+
+  if (database === "mongodb") {
+    p.log.info(
+      `MongoDB must be running before ${color.cyan("npm run dev")} —\n${color.dim(
+        "set your own connection string in .env if it isn't mongodb://localhost:27017",
+      )}`,
+    );
+  }
+
+  if (database === "prisma") {
+    p.log.info(
+      `PostgreSQL must be running before ${color.cyan("npm run db:push")} —\n${color.dim(
+        "set your own user/password in .env (default: postgres:postgres@localhost:5432)",
+      )}`,
+    );
+  }
+
+  const steps = [
+    `cd ${projectName}`,
+    !installed && "npm install",
+    database === "mongodb" && "edit .env  # set DB_URL",
+    database === "prisma" && "edit .env  # set DATABASE_URL",
+    database === "prisma" && "npm run db:push",
+    "npm run dev",
+  ]
+    .filter(Boolean)
+    .map((step) => color.cyan(step))
+    .join("\n");
+
+  p.note(steps, "Next steps");
 
   p.outro(
     `Brewed and ready. Enjoy your oliang 🧋 ${color.dim(REPO_URL)}`,

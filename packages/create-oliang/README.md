@@ -19,16 +19,17 @@ npx create-oliang my-app
 ```
 
 The CLI asks which language you want (TypeScript / JavaScript), how to start
-(Blank / Example), and whether to add `.http` test files (for kulala.nvim,
-VS Code REST Client, or JetBrains), then copies the matching template, writes
-`.env` from `.env.example`, and offers to run `npm install` for you.
+(Blank / Example), which database (None / MongoDB / Prisma), and whether to
+add `.http` test files (for kulala.nvim, VS Code REST Client, or JetBrains),
+then copies the matching template, writes `.env` from `.env.example`, and
+offers to run `npm install` for you.
 
 Skip the prompts with flags:
 
 ```bash
-npm create oliang my-app -- --ts --blank     # TypeScript, clean structure
-npm create oliang my-app -- --ts --example   # TypeScript, users CRUD demo
-npm create oliang my-app -- --js --example   # JavaScript, users CRUD demo
+npm create oliang my-app -- --ts --blank --no-db     # TypeScript, clean structure
+npm create oliang my-app -- --ts --example --prisma  # users CRUD on Prisma + PostgreSQL
+npm create oliang my-app -- --js --example --mongodb # users CRUD on MongoDB
 npm create oliang my-app -- --ts --blank --no-http   # skip .http test files
 ```
 
@@ -40,6 +41,22 @@ npm create oliang my-app -- --ts --blank --no-http   # skip .http test files
 - **Example** — everything in Blank plus a users CRUD
   (`/api/users`) showing the full request flow:
   route → controller (typed zod parse) → service.
+
+## Databases
+
+- **None** — the Example starter stores data in memory; wire up your own
+  database later.
+- **MongoDB** — mongoose, `connectDBService()` in `src/config/db.config`,
+  models in `src/models/`. Requires a running MongoDB (`DB_URL` in `.env`).
+- **Prisma** — Prisma ORM 7 with PostgreSQL by default. Requires a running
+  PostgreSQL (`DATABASE_URL` in `.env`), then `npm run db:push` +
+  `npm run dev`. To use another database (SQLite, MySQL/MariaDB, SQL Server),
+  swap the provider in `prisma/schema.prisma` **and** the driver adapter in
+  `src/lib/prisma` together — they must match. Note: Prisma 7 has no MongoDB
+  adapter — for MongoDB pick the MongoDB (mongoose) option instead.
+
+With Example + a database, the users CRUD reads and writes the real
+database instead of memory.
 
 ## What you get
 
@@ -54,15 +71,17 @@ npm create oliang my-app -- --ts --blank --no-http   # skip .http test files
 my-app/
 ├── http/                   # .http test files (health.http, + users.http in Example)
 │   └── http-client.env.json
+├── prisma/                 # (Prisma) schema.prisma — plus prisma.config.ts at root
 ├── src/
 │   ├── index.ts            # Express setup + route mounting
-│   ├── config/             # env + HTTP status constants
+│   ├── config/             # env + HTTP status constants (+ db.config with MongoDB)
 │   ├── controllers/        # request/response handling (health, + user in Example)
-│   ├── lib/                # shared libraries
+│   ├── lib/                # shared libraries (prisma client with Prisma)
 │   ├── middlewares/        # errorHandler (zod-aware in Example)
+│   ├── models/             # (MongoDB) mongoose models
 │   ├── routes/             # route definitions (health, + user in Example)
 │   ├── script/             # one-off scripts, e.g. seeding
-│   ├── services/           # business logic (in-memory data in Example)
+│   ├── services/           # business logic
 │   ├── types/              # shared types
 │   ├── utils/              # AppError, getEnv
 │   └── validators/         # request schemas (zod in Example)

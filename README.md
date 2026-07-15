@@ -11,9 +11,10 @@
 npm create oliang
 ```
 
-That's it. Pick TypeScript or JavaScript, then **Blank** (clean structure) or
-**Example** (users CRUD demo), and you get a ready-to-run Express 5 starter
-with env config, HTTP status constants, and centralized error handling.
+That's it. Pick TypeScript or JavaScript, **Blank** (clean structure) or
+**Example** (users CRUD demo), and your database (**MongoDB**, **Prisma** with
+PostgreSQL, or none) — and you get a ready-to-run Express 5 starter with
+env config, HTTP status constants, and centralized error handling.
 
 ## Packages
 
@@ -48,8 +49,9 @@ my-app/
 
 The **Example** starter fills the structure with a users CRUD (`/api/users`)
 showing the full request flow: route → controller (typed zod parse) → service.
-The `models/` layer is intentionally left out — add it when you wire up a
-real database.
+Pick **MongoDB** or **Prisma** and the CRUD runs on a real database — mongoose
+models in `src/models/`, or a Prisma schema on PostgreSQL
+(`npm run db:push` → `npm run dev`).
 
 ## Docs
 
@@ -80,8 +82,9 @@ npm run test:smoke
 ## Roadmap
 
 - [x] `create-oliang` scaffolder
-- [ ] Template variants (with database, with auth)
-- [ ] Grow `oliang` core: validation helpers, async handler wrapper
+- [x] Database option: MongoDB (mongoose) & Prisma (PostgreSQL by default)
+- [ ] Auth starter variant
+- [ ] Grow `oliang` core: validation helpers
 - [ ] Docs site
 
 ## License

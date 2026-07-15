@@ -1,0 +1,8 @@
+NODE_ENV=development
+PORT=3000
+BASE_URL=http://localhost:3000
+FRONTEND_ORIGIN=http://localhost:5173
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/oliang-app"
+# Cloud providers (Neon / Supabase / Railway) usually need SSL — use
+# sslmode=verify-full to avoid the pg security warning, e.g.
+# DATABASE_URL="postgresql://user:password@host:5432/dbname?sslmode=verify-full"

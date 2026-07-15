@@ -14,7 +14,7 @@ import {
 // Express 5 forwards rejected promises to the error handler automatically,
 // so async controllers can throw (AppError, ZodError) without try/catch.
 export const listUsersController = async (_req, res) => {
-  const users = listUsersService();
+  const users = await listUsersService();
 
   return res.status(HTTPSTATUS.OK).json({
     message: "Users fetched successfully",
@@ -23,7 +23,7 @@ export const listUsersController = async (_req, res) => {
 };
 
 export const getUserController = async (req, res) => {
-  const user = getUserService(req.params.id);
+  const user = await getUserService(req.params.id);
 
   return res.status(HTTPSTATUS.OK).json({
     message: "User fetched successfully",
@@ -34,7 +34,7 @@ export const getUserController = async (req, res) => {
 export const createUserController = async (req, res) => {
   const body = createUserSchema.parse(req.body);
 
-  const user = createUserService(body);
+  const user = await createUserService(body);
 
   return res.status(HTTPSTATUS.CREATED).json({
     message: "User created successfully",
@@ -45,7 +45,7 @@ export const createUserController = async (req, res) => {
 export const updateUserController = async (req, res) => {
   const body = updateUserSchema.parse(req.body);
 
-  const user = updateUserService(req.params.id, body);
+  const user = await updateUserService(req.params.id, body);
 
   return res.status(HTTPSTATUS.OK).json({
     message: "User updated successfully",
@@ -54,7 +54,7 @@ export const updateUserController = async (req, res) => {
 };
 
 export const deleteUserController = async (req, res) => {
-  deleteUserService(req.params.id);
+  await deleteUserService(req.params.id);
 
   return res.status(HTTPSTATUS.OK).json({
     message: "User deleted successfully",
