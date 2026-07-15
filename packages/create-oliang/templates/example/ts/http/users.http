@@ -1,0 +1,34 @@
+### List users
+GET {{base_api_url}}/users
+
+### Create user
+POST {{base_api_url}}/users
+Content-Type: application/json
+
+{
+  "name": "Ford",
+  "email": "ford@example.com"
+}
+
+### Get user by id (replace :id with a real id from the list)
+GET {{base_api_url}}/users/:id
+
+### Update user
+PUT {{base_api_url}}/users/:id
+Content-Type: application/json
+
+{
+  "name": "Ford Updated"
+}
+
+### Delete user
+DELETE {{base_api_url}}/users/:id
+
+### Create user with invalid body (expect 400)
+POST {{base_api_url}}/users
+Content-Type: application/json
+
+{
+  "name": "",
+  "email": "not-an-email"
+}

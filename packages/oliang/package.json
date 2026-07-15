@@ -1,0 +1,44 @@
+{
+  "name": "oliang",
+  "version": "0.1.0",
+  "description": "Tiny error-handling core for Express + TypeScript apps. Scaffold a full app with `npm create oliang` ☕",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "express",
+    "typescript",
+    "error-handling",
+    "oliang"
+  ],
+  "author": "thefordz",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thefordz/oliang.git",
+    "directory": "packages/oliang"
+  },
+  "peerDependencies": {
+    "express": ">=4"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "typescript": "^5.9.2"
+  }
+}

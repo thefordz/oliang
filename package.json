@@ -1,0 +1,12 @@
+{
+  "name": "oliang-monorepo",
+  "private": true,
+  "description": "Oliang — Express + TypeScript, brewed the Thai way",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "test:smoke": "bash scripts/smoke-test.sh"
+  }
+}

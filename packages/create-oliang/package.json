@@ -1,0 +1,36 @@
+{
+  "name": "create-oliang",
+  "version": "0.1.0",
+  "description": "Scaffold an Express + TypeScript app, brewed the Thai way ☕",
+  "type": "module",
+  "bin": {
+    "create-oliang": "index.js"
+  },
+  "files": [
+    "index.js",
+    "templates"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "express",
+    "typescript",
+    "scaffold",
+    "starter",
+    "template",
+    "cli",
+    "oliang"
+  ],
+  "author": "thefordz",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thefordz/oliang.git",
+    "directory": "packages/create-oliang"
+  },
+  "dependencies": {
+    "@clack/prompts": "^1.7.0",
+    "picocolors": "^1.1.1"
+  }
+}

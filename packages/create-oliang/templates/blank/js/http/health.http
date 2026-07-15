@@ -1,0 +1,2 @@
+### Check health
+GET {{base_url}}/health
